@@ -17,9 +17,11 @@ data[,2] <- as.Date(data[,2])
 totals <- tapply(data$steps, data$date, sum, na.rm = TRUE)
 hist(totals)
 means <- tapply(data$steps, data$date, mean, na.rm = TRUE)
-means
+means[is.nan(means)] <- 0
 medians <- tapply(data$steps, data$date, median, na.rm = TRUE)
-medians
+medians[is.nan(medians)] <- 0
+aves <- rbind(means, medians)
+print(aves)
 ```
 
 ## What is the average daily activity pattern?
@@ -45,3 +47,18 @@ medians <- tapply(data$steps, data$date, median, na.rm = TRUE)
 medians
 ```
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+data['Weekday'] <- TRUE
+data[(weekdays.Date(data$date) == "Saturday"), 'Weekday'] <- FALSE
+data[(weekdays.Date(data$date) == "Sunday"), 'Weekday'] <- FALSE
+weekdayData <- data[data$Weekday,]
+weekendData <- data[!data$Weekday,]
+weekdayPattern <- tapply(weekdayData$steps, 
+weekdayData$interval, mean, na.rm = TRUE)
+par(mfrow = c(2,1))
+plot(weekdayPattern, type = 'l')
+weekendPattern <- tapply(weekendData$steps, 
+weekendData$interval, mean, na.rm = TRUE)
+plot(weekendPattern, type = 'l')
+```
